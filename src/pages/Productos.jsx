@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 
-const API_URL = '/api/productos'
+const API_URL = 'https://web-service-ventas-api.onrender.com/api/productos'
 
 export default function Productos() {
   const [productos, setProductos] = useState([])
