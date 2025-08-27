@@ -12,13 +12,13 @@ import {
 } from '@headlessui/react'
 import {
   Bars3Icon,
-  HomeIcon,
+  BuildingStorefrontIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
 const navigation = [
-  { name: 'Dashboard', to: '/', icon: HomeIcon },
+  { name: 'Productos', to: '/', icon: BuildingStorefrontIcon },
 ]
 
 function classNames(...classes) {
@@ -29,7 +29,7 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-200">
       {/* Mobile sidebar */}
       <Dialog open={sidebarOpen} onClose={setSidebarOpen} className="relative z-50 lg:hidden">
         <DialogBackdrop
@@ -177,19 +177,14 @@ export default function Layout() {
                   transition
                   className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-gray-900/5 transition data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
                 >
-                  {[
-                    { name: 'Your profile', href: '#' },
-                    { name: 'Sign out', href: '#' },
-                  ].map((item) => (
-                    <MenuItem key={item.name}>
+                    <MenuItem>
                       <a
-                        href={item.href}
+                        href="#"
                         className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden"
                       >
-                        {item.name}
+                        Cerrar sesión
                       </a>
                     </MenuItem>
-                  ))}
                 </MenuItems>
               </Menu>
             </div>
@@ -198,8 +193,11 @@ export default function Layout() {
 
         <main className="py-10">
           <div className="px-4 sm:px-6 lg:px-8">
-            {/* Aquí se pintan las vistas hijas */}
-            <Outlet />
+          <div className="overflow-hidden rounded-lg bg-white shadow-sm">
+            <div className="px-4 py-5 sm:p-6">
+              <Outlet />
+            </div>
+          </div>
           </div>
         </main>
       </div>
