@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getProductos } from '../../services/Productos/getProductos'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 
 export default function Productos() {
   const [productos, setProductos] = useState([])
@@ -59,6 +59,12 @@ export default function Productos() {
                   <td className="px-3 py-4 text-sm text-gray-700">Q{p.precio}</td>
                   <td className="px-3 py-4 text-sm text-gray-700">{p.cantidad}</td>
                   <td className="px-3 py-4 text-sm text-gray-500">{p.descripcion}</td>
+                  <td><Link
+                        to="/productos/edit"
+                        className="rounded-md bg-indigo-900 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+                      >
+                        Editar
+                      </Link></td>
                 </tr>
               ))
             ) : (

@@ -4,6 +4,7 @@ import Layout from './components/layout/Layout'
 
 const Productos = lazy(() => import('./pages/Productos/Index.jsx'))
 const CreateProducto = lazy(() => import('./pages/Productos/Create.jsx'))
+const EditProducto = lazy(() => import('./pages/Productos/Edit.jsx'))
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={null}>
             <CreateProducto />
+          </Suspense>
+        )
+      },
+      {
+        path: 'productos/edit',
+        element: (
+          <Suspense fallback={null}>
+            <EditProducto />
           </Suspense>
         )
       },
