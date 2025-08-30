@@ -13,12 +13,14 @@ import {
 import {
   Bars3Icon,
   BuildingStorefrontIcon,
+  RocketLaunchIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
 const navigation = [
   { name: 'Productos', to: '/', icon: BuildingStorefrontIcon },
+  { name: 'Ventas', to: '/ventas', icon: RocketLaunchIcon },
 ]
 
 function classNames(...classes) {

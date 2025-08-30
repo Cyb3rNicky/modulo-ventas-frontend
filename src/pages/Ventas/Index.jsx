@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react'
 import { getProductos } from '../../services/Productos/getProductos'
-import { deleteProducto } from '../../services/Productos/deleteProducto'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 
 export default function Productos() {
   const [productos, setProductos] = useState([])
   const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(false)
 
   const cargar = () => {
     setError(null)
@@ -19,32 +17,18 @@ export default function Productos() {
     cargar()
   }, [])
 
-  const onDelete = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este producto?')) return
-    try {
-      setLoading(true)
-      await deleteProducto(id)
-      // refrescar lista después de eliminar
-      cargar()
-    } catch (err) {
-      setError(err.message || 'No se pudo eliminar el producto')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-base font-semibold text-gray-900">Productos</h1>
+          <h1 className="text-base font-semibold text-gray-900">Ventas</h1>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <Link
-            to="/productos/create"
+            to="/ventas/create"
             className="rounded-md bg-indigo-900 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
           >
-            Crear producto
+            Crear venta
           </Link>
         </div>
       </div>
@@ -64,7 +48,6 @@ export default function Productos() {
               <th className="px-3 py-3 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">Precio</th>
               <th className="px-3 py-3 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">Cantidad</th>
               <th className="px-3 py-3 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">Descripción</th>
-              <th className="px-3 py-3 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
@@ -76,26 +59,17 @@ export default function Productos() {
                   <td className="px-3 py-4 text-sm text-gray-700">Q{p.precio}</td>
                   <td className="px-3 py-4 text-sm text-gray-700">{p.cantidad}</td>
                   <td className="px-3 py-4 text-sm text-gray-500">{p.descripcion}</td>
-                  <td className="px-3 py-4 text-sm flex gap-2">
-                    <Link
-                      to={`/productos/edit/${p.id}`}
-                      className="rounded-md bg-indigo-900 px-3 py-1 text-sm font-semibold text-white hover:bg-indigo-500"
-                    >
-                      Editar
-                    </Link>
-                    <button
-                      onClick={() => onDelete(p.id)}
-                      disabled={loading}
-                      className="rounded-md bg-red-600 px-3 py-1 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-50"
-                    >
-                      Eliminar
-                    </button>
-                  </td>
+                  <td><Link
+                        to="/productos/edit"
+                        className="rounded-md bg-indigo-900 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+                      >
+                        Editar
+                      </Link></td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="px-3 py-10 text-center text-sm text-gray-500">
+                <td colSpan={5} className="px-3 py-10 text-center text-sm text-gray-500">
                   {error ? '—' : 'No hay productos para mostrar.'}
                 </td>
               </tr>
