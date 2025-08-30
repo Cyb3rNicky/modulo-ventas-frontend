@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Outlet, NavLink } from 'react-router-dom'
+// components/layout/Layout.jsx
+import { useEffect, useState } from 'react'
+import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import {
   Dialog,
   DialogBackdrop,
@@ -18,6 +19,9 @@ import {
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
+// 👇 importa utilidades de auth
+import { getAuth, clearAuth } from '../../utils/auth'
+
 const navigation = [
   { name: 'Productos', to: '/', icon: BuildingStorefrontIcon },
   { name: 'Ventas', to: '/ventas', icon: RocketLaunchIcon },
@@ -29,6 +33,25 @@ function classNames(...classes) {
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [userName, setUserName] = useState('Usuario')
+  const navigate = useNavigate()
+
+  // Lee el usuario de la sesión y muestra un nombre bonito
+  useEffect(() => {
+    const a = getAuth()
+    const mostrado =
+      a?.user?.nombre?.trim() ||
+      a?.user?.userName?.trim() ||
+      a?.user?.email?.split('@')?.[0] ||
+      'Usuario'
+    setUserName(mostrado)
+  }, [])
+
+  // Cerrar sesión
+  const onLogout = () => {
+    clearAuth()
+    navigate('/login', { replace: true })
+  }
 
   return (
     <div className="min-h-screen bg-gray-200">
@@ -170,7 +193,7 @@ export default function Layout() {
                   />
                   <span className="hidden lg:flex lg:items-center">
                     <span aria-hidden="true" className="ml-4 text-sm/6 font-semibold text-gray-900">
-                      Usuario
+                      {userName}
                     </span>
                     <ChevronDownIcon aria-hidden="true" className="ml-2 size-5 text-gray-400" />
                   </span>
@@ -179,14 +202,14 @@ export default function Layout() {
                   transition
                   className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-gray-900/5 transition data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
                 >
-                    <MenuItem>
-                      <a
-                        href="#"
-                        className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden"
-                      >
-                        Cerrar sesión
-                      </a>
-                    </MenuItem>
+                  <MenuItem>
+                    <button
+                      onClick={onLogout}
+                      className="block w-full text-left px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </MenuItem>
                 </MenuItems>
               </Menu>
             </div>
@@ -195,11 +218,11 @@ export default function Layout() {
 
         <main className="py-10">
           <div className="px-4 sm:px-6 lg:px-8">
-          <div className="overflow-hidden rounded-lg bg-white shadow-sm">
-            <div className="px-4 py-5 sm:p-6">
-              <Outlet />
+            <div className="overflow-hidden rounded-lg bg-white shadow-sm">
+              <div className="px-4 py-5 sm:p-6">
+                <Outlet />
+              </div>
             </div>
-          </div>
           </div>
         </main>
       </div>
