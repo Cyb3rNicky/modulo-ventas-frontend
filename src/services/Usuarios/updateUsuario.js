@@ -12,7 +12,7 @@ export const updateUsuario = async ({ id, passwordNueva, confirmarPasswordNueva 
 
    // apiFetch ya maneja token, headers y errores
   const result = await apiFetch(url, {
-    method: "PUT",
+    method: "POST",
     body: JSON.stringify(payload),
   });
 
