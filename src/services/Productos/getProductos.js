@@ -1,8 +1,10 @@
+import { apiFetch } from "../../utils/apiFetch";
+
 export const getProductos = async () => {
   
   const url = 'https://web-service-ventas-api.onrender.com/api/productos';
-  const resp = await fetch(url);
-  const { data } = await resp.json();
+  
+  const { data } = await apiFetch(url);
 
   return data.map(producto => ({
     id:          producto.id,

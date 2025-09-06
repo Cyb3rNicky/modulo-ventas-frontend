@@ -9,6 +9,10 @@ const Productos = lazy(() => import("./pages/Productos/Index.jsx"));
 const CreateProducto = lazy(() => import("./pages/Productos/Create.jsx"));
 const EditProducto = lazy(() => import("./pages/Productos/Edit.jsx"));
 
+const Usuarios = lazy(() => import("./pages/Usuarios/Index.jsx"));
+const CreateUsuarios = lazy(() => import("./pages/Usuarios/Create.jsx"));
+const EditUsuarios = lazy(() => import("./pages/Usuarios/Edit.jsx"));
+
 const Ventas = lazy(() => import("./pages/Ventas/Index.jsx"));
 const CreateVentas = lazy(() => import("./pages/Ventas/Create.jsx"));
 
@@ -65,10 +69,34 @@ const router = createBrowserRouter([
             ),
           },
           {
+            path: "usuarios",
+            element: (
+              <Suspense fallback={null}>
+                <Usuarios />
+              </Suspense>
+            ),
+          },
+          {
             path: "ventas/create",
             element: (
               <Suspense fallback={null}>
                 <CreateVentas />
+              </Suspense>
+            ),
+          },
+          {
+            path: "usuarios/create",
+            element: (
+              <Suspense fallback={null}>
+                <CreateUsuarios />
+              </Suspense>
+            ),
+          },
+          {
+            path: "usuarios/edit/:id",
+            element: (
+              <Suspense fallback={null}>
+                <EditUsuarios />
               </Suspense>
             ),
           },

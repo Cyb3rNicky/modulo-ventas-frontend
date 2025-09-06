@@ -1,4 +1,6 @@
 // src/services/Productos/createProducto.js
+import { apiFetch } from "../../utils/apiFetch";
+
 export const createProducto = async ({ nombre, descripcion, precio, cantidad }) => {
   const url = 'https://web-service-ventas-api.onrender.com/api/Productos';
 
@@ -11,26 +13,10 @@ export const createProducto = async ({ nombre, descripcion, precio, cantidad }) 
     cantidad: Number(cantidad),
   };
 
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
 
-  if (!resp.ok) {
-    // intenta leer JSON de error; si no se puede, lanza el texto
-    let msg = `HTTP ${resp.status}`;
-    try {
-      const err = await resp.json();
-      msg += ` - ${err?.title || err?.error || ''}`;
-    } catch {
-      msg += ` - ${await resp.text()}`;
-    }
-    throw new Error(msg);
-  }
+  return apiFetch(url, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }); // devuelve el producto creado (según imple del API)
 
-  return resp.json(); // devuelve el producto creado (según imple del API)
 };

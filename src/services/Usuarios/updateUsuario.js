@@ -1,15 +1,13 @@
 // src/services/Productos/updateProducto.js
 import { apiFetch } from "../../utils/apiFetch";
 
-export const updateProducto = async ({ id, nombre, descripcion, precio, cantidad }) => {
-  const url = `https://web-service-ventas-api.onrender.com/api/Productos/${id}`;
+export const updateUsuario = async ({ id, passwordNueva, confirmarPasswordNueva }) => {
+  const url = `https://web-service-ventas-api.onrender.com/api/auth/resetear-password/${id}`;
 
   const payload = {
     id: Number(id), // el backend valida que id del body == id de la ruta
-    nombre,
-    descripcion,
-    precio: Number(precio),
-    cantidad: Number(cantidad),
+    passwordNueva,
+    confirmarPasswordNueva,
   };
 
    // apiFetch ya maneja token, headers y errores

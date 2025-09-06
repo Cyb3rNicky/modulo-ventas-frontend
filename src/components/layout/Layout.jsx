@@ -16,6 +16,7 @@ import {
   BuildingStorefrontIcon,
   RocketLaunchIcon,
   XMarkIcon,
+  UsersIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 
@@ -25,6 +26,8 @@ import { getAuth, clearAuth } from '../../utils/auth'
 const navigation = [
   { name: 'Productos', to: '/', icon: BuildingStorefrontIcon },
   { name: 'Ventas', to: '/ventas', icon: RocketLaunchIcon },
+  { name: 'Usuarios', to: '/Usuarios', icon: UsersIcon },
+
 ]
 
 function classNames(...classes) {
