@@ -1,3 +1,6 @@
+// src/services/Ventas/createVenta.js
+import { apiFetch } from "../../utils/apiFetch";
+
 export const createVenta = async ({ clienteId, productos }) => {
   const url = 'https://web-service-ventas-api.onrender.com/api/Ventas';
 
@@ -9,17 +12,10 @@ export const createVenta = async ({ clienteId, productos }) => {
     })),
   };
 
-  const resp = await fetch(url, {
+  const resp = await apiFetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify(payload),
   });
 
-  if (!resp.ok) {
-    let msg = `HTTP ${resp.status}`;
-    try { msg += ` - ${await resp.text()}`; } catch {}
-    throw new Error(msg);
-  }
-
-  return resp.json();
+  return resp; // devuelve la respuesta del API con la venta creada
 };
