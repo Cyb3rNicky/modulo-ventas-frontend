@@ -1,9 +1,22 @@
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { isLoggedIn } from '../utils/auth';
+import { Navigate } from "react-router-dom";
+import { isLogged, isAdmin } from "../utils/auth";
 
-export default function ProtectedRoute() {
-  const logged = isLoggedIn();
-  const location = useLocation();
-  if (!logged) return <Navigate to="/login" replace state={{ from: location }} />;
-  return <Outlet />;
+/**
+ * Protege rutas según login y rol de admin
+ * @param {React.Component} children - Componente a renderizar
+ * @param {boolean} admin - Si true, solo usuarios admin pueden acceder
+ */
+export default function ProtectedRoute({ children, admin = false }) {
+  // Si no está logueado -> redirige a login
+  if (!isLogged()) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Si requiere admin pero no lo es -> redirige a home
+  if (admin && !isAdmin()) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Usuario logueado y autorizado
+  return children;
 }

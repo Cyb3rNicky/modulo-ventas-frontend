@@ -1,6 +1,5 @@
-// components/layout/Layout.jsx
-import { useEffect, useState } from 'react'
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from "react";
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogBackdrop,
@@ -10,80 +9,91 @@ import {
   MenuItem,
   MenuItems,
   TransitionChild,
-} from '@headlessui/react'
+} from "@headlessui/react";
 import {
   Bars3Icon,
   BuildingStorefrontIcon,
   RocketLaunchIcon,
   XMarkIcon,
   UsersIcon,
-} from '@heroicons/react/24/outline'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+} from "@heroicons/react/24/outline";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
-// 👇 importa utilidades de auth
-import { getAuth, clearAuth } from '../../utils/auth'
+import { getAuth, clearAuth, isAdmin } from "../../utils/auth";
 
-const navigation = [
-  { name: 'Productos', to: '/', icon: BuildingStorefrontIcon },
-  { name: 'Ventas', to: '/ventas', icon: RocketLaunchIcon },
-  { name: 'Usuarios', to: '/Usuarios', icon: UsersIcon },
+// Menú base: todos los usuarios logueados lo ven
+const baseNavigation = [
+  { name: "Productos", to: "/", icon: BuildingStorefrontIcon },
+  { name: "Ventas", to: "/ventas", icon: RocketLaunchIcon },
+];
 
-]
+// Menú exclusivo admin
+const adminNavigation = [
+  { name: "Usuarios", to: "/Usuarios", icon: UsersIcon },
+];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function Layout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [userName, setUserName] = useState('Usuario')
-  const navigate = useNavigate()
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userName, setUserName] = useState("Usuario");
+  const [navigation, setNavigation] = useState(baseNavigation);
+  const navigate = useNavigate();
 
-  // Lee el usuario de la sesión y muestra un nombre bonito
   useEffect(() => {
-    const a = getAuth()
+    const a = getAuth();
+
+    // Nombre de usuario a mostrar
     const mostrado =
       a?.user?.nombre?.trim() ||
       a?.user?.userName?.trim() ||
-      a?.user?.email?.split('@')?.[0] ||
-      'Usuario'
-    setUserName(mostrado)
-  }, [])
+      a?.user?.email?.split("@")?.[0] ||
+      "Usuario";
+    setUserName(mostrado);
+
+    // Roles: si es admin agregar menú de Usuarios
+    if (isAdmin()) {
+      setNavigation([...baseNavigation, ...adminNavigation]);
+    } else {
+      setNavigation(baseNavigation);
+    }
+  }, []);
 
   // Cerrar sesión
   const onLogout = () => {
-    clearAuth()
-    navigate('/login', { replace: true })
-  }
+    clearAuth();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <div className="min-h-screen bg-gray-200">
-      {/* Mobile sidebar */}
-      <Dialog open={sidebarOpen} onClose={setSidebarOpen} className="relative z-50 lg:hidden">
-        <DialogBackdrop
-          transition
-          className="fixed inset-0 bg-gray-900/80 transition-opacity duration-300 ease-linear data-closed:opacity-0"
-        />
-
+      {/* Sidebar mobile */}
+      <Dialog
+        open={sidebarOpen}
+        onClose={setSidebarOpen}
+        className="relative z-50 lg:hidden"
+      >
+        <DialogBackdrop className="fixed inset-0 bg-gray-900/80" />
         <div className="fixed inset-0 flex">
-          <DialogPanel
-            transition
-            className="relative mr-16 flex w-full max-w-xs flex-1 transform transition duration-300 ease-in-out data-closed:-translate-x-full"
-          >
+          <DialogPanel className="relative mr-16 flex w-full max-w-xs flex-1 transform transition duration-300 ease-in-out">
             <TransitionChild>
-              <div className="absolute top-0 left-full flex w-16 justify-center pt-5 duration-300 ease-in-out data-closed:opacity-0">
-                <button type="button" onClick={() => setSidebarOpen(false)} className="-m-2.5 p-2.5">
-                  <span className="sr-only">Close sidebar</span>
-                  <XMarkIcon aria-hidden="true" className="size-6 text-white" />
+              <div className="absolute top-0 left-full flex w-16 justify-center pt-5">
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen(false)}
+                  className="-m-2.5 p-2.5"
+                >
+                  <XMarkIcon className="size-6 text-white" />
                 </button>
               </div>
             </TransitionChild>
 
-            {/* Sidebar content */}
             <div className="relative flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
               <div className="relative flex h-16 shrink-0 items-center">
                 <img
-                  alt="Your Company"
+                  alt="Logo"
                   src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Escudo_de_la_universidad_Mariano_G%C3%A1lvez_Guatemala.svg/1024px-Escudo_de_la_universidad_Mariano_G%C3%A1lvez_Guatemala.svg.png"
                   className="h-8 w-auto"
                 />
@@ -96,23 +106,24 @@ export default function Layout() {
                         <li key={item.name}>
                           <NavLink
                             to={item.to}
-                            end={item.to === '/'}
+                            end={item.to === "/"}
                             className={({ isActive }) =>
                               classNames(
-                                isActive ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white',
-                                'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
+                                isActive
+                                  ? "bg-white/5 text-white"
+                                  : "text-gray-400 hover:bg-white/5 hover:text-white",
+                                "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
                               )
                             }
                             onClick={() => setSidebarOpen(false)}
                           >
-                            <item.icon aria-hidden="true" className="size-6 shrink-0" />
+                            <item.icon className="size-6 shrink-0" />
                             {item.name}
                           </NavLink>
                         </li>
                       ))}
                     </ul>
                   </li>
-
                 </ul>
               </nav>
             </div>
@@ -120,12 +131,12 @@ export default function Layout() {
         </div>
       </Dialog>
 
-      {/* Static sidebar (desktop) */}
+      {/* Sidebar desktop */}
       <div className="hidden bg-gray-900 ring-1 ring-white/10 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-black/10 px-6 pb-4">
           <div className="flex h-16 shrink-0 items-center">
             <img
-              alt="Your Company"
+              alt="Logo"
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Escudo_de_la_universidad_Mariano_G%C3%A1lvez_Guatemala.svg/1024px-Escudo_de_la_universidad_Mariano_G%C3%A1lvez_Guatemala.svg.png"
               className="h-12 w-auto"
             />
@@ -138,85 +149,65 @@ export default function Layout() {
                     <li key={item.name}>
                       <NavLink
                         to={item.to}
-                        end={item.to === '/'}
+                        end={item.to === "/"}
                         className={({ isActive }) =>
                           classNames(
-                            isActive ? 'bg-white/5 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white',
-                            'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
+                            isActive
+                              ? "bg-white/5 text-white"
+                              : "text-gray-400 hover:bg-white/5 hover:text-white",
+                            "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
                           )
                         }
                       >
-                        <item.icon aria-hidden="true" className="size-6 shrink-0" />
+                        <item.icon className="size-6 shrink-0" />
                         {item.name}
                       </NavLink>
                     </li>
                   ))}
                 </ul>
               </li>
-
             </ul>
           </nav>
         </div>
       </div>
 
-      {/* Top bar + content */}
+      {/* Top bar + main content */}
       <div className="lg:pl-72">
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8">
+        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-end gap-x-4 border-b border-gray-200 bg-white px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8">
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
             className="-m-2.5 p-2.5 text-gray-700 hover:text-gray-900 lg:hidden"
           >
-            <span className="sr-only">Open sidebar</span>
-            <Bars3Icon aria-hidden="true" className="size-6" />
+            <Bars3Icon className="size-6" />
           </button>
 
-          <div aria-hidden="true" className="h-6 w-px bg-gray-900/10 lg:hidden" />
-
-          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-            <form action="#" method="GET" className="grid flex-1 grid-cols-1">
-            </form>
-
-            <div className="flex items-center gap-x-4 lg:gap-x-6">
-              <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
-                <span className="sr-only">View notifications</span>
-              </button>
-
-              <div aria-hidden="true" className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" />
-
-              {/* Profile dropdown */}
-              <Menu as="div" className="relative">
-                <MenuButton className="relative flex items-center">
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">Open user menu</span>
-                  <img
-                    alt=""
-                    src="https://marketplace.canva.com/A5alg/MAESXCA5alg/1/tl/canva-user-icon-MAESXCA5alg.png"
-                    className="size-8 rounded-full bg-gray-50 outline -outline-offset-1 outline-black/5"
-                  />
-                  <span className="hidden lg:flex lg:items-center">
-                    <span aria-hidden="true" className="ml-4 text-sm/6 font-semibold text-gray-900">
-                      {userName}
-                    </span>
-                    <ChevronDownIcon aria-hidden="true" className="ml-2 size-5 text-gray-400" />
-                  </span>
-                </MenuButton>
-                <MenuItems
-                  transition
-                  className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-gray-900/5 transition data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
+          <Menu as="div" className="relative">
+            <MenuButton className="relative flex items-center">
+              <span className="sr-only">Open user menu</span>
+              <img
+                alt=""
+                src="https://marketplace.canva.com/A5alg/MAESXCA5alg/1/tl/canva-user-icon-MAESXCA5alg.png"
+                className="size-8 rounded-full bg-gray-50 outline -outline-offset-1 outline-black/5"
+              />
+              <span className="hidden lg:flex lg:items-center">
+                <span className="ml-4 text-sm/6 font-semibold text-gray-900">
+                  {userName}
+                </span>
+                <ChevronDownIcon className="ml-2 size-5 text-gray-400" />
+              </span>
+            </MenuButton>
+            <MenuItems className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg outline outline-gray-900/5">
+              <MenuItem>
+                <button
+                  onClick={onLogout}
+                  className="block w-full text-left px-3 py-1 text-sm/6 text-gray-900"
                 >
-                  <MenuItem>
-                    <button
-                      onClick={onLogout}
-                      className="block w-full text-left px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden"
-                    >
-                      Cerrar sesión
-                    </button>
-                  </MenuItem>
-                </MenuItems>
-              </Menu>
-            </div>
-          </div>
+                  Cerrar sesión
+                </button>
+              </MenuItem>
+            </MenuItems>
+          </Menu>
         </div>
 
         <main className="py-10">
@@ -230,5 +221,5 @@ export default function Layout() {
         </main>
       </div>
     </div>
-  )
+  );
 }
