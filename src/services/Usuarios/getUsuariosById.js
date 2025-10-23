@@ -1,19 +1,20 @@
-// src/services/Usuarios/getUsuarioById.js
 import { apiFetch } from "../../utils/apiFetch";
 
 export const getUsuarioById = async (id) => {
-  const url = "https://web-service-ventas-api.onrender.com/api/admin/usuarios";
+  const url = `https://web-service-ventas-api.onrender.com/api/admin/usuarios/${id}`;
+  const json = await apiFetch(url, { method: "GET" });
 
-  const usuarios = await apiFetch(url); // devuelve un array
+  const u = json?.data ?? json;
 
-  const usuario = usuarios.find(u => u.id === Number(id));
-  if (!usuario) throw new Error("Usuario no encontrado");
+  if (!u || typeof u !== "object") {
+    throw new Error("Usuario no encontrado");
+  }
 
   return {
-    id: usuario.id,
-    userName: usuario.userName,
-    email: usuario.email,
-    nombre: usuario.nombre,
-    apellido: usuario.apellido,
+    id: u.id,
+    userName: u.userName,
+    email: u.email,
+    nombre: u.nombre,
+    apellido: u.apellido,
   };
 };

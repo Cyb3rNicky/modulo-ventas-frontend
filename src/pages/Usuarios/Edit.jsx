@@ -1,4 +1,3 @@
-// src/pages/Usuarios/ResetPasswordUsuario.js
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { getUsuarioById } from '../../services/Usuarios/getUsuariosById'
