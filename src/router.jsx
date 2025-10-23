@@ -15,24 +15,18 @@ const Usuarios = lazy(() => import("./pages/Usuarios/Index.jsx"));
 const CreateUsuarios = lazy(() => import("./pages/Usuarios/Create.jsx"));
 const EditUsuarios = lazy(() => import("./pages/Usuarios/Edit.jsx"));
 
+// Clientes
 const Clientes = lazy(() => import("./pages/Clientes/Index.jsx"));
-// const CreateCliente = lazy(() => import("./pages/Clientes/Create.jsx"));
-// const EditCliente = lazy(() => import("./pages/Clientes/Edit.jsx"));
+const CreateCliente = lazy(() => import("./pages/Clientes/Create.jsx"));
+const EditCliente = lazy(() => import("./pages/Clientes/Edit.jsx"));
 
-// const Vehiculos = lazy(() => import("./pages/Vehiculos/Index.jsx"));
-// const CreateVehiculo = lazy(() => import("./pages/Vehiculos/Create.jsx"));
-// const EditVehiculo = lazy(() => import("./pages/Vehiculos/Edit.jsx"));
 
 const Etapas = lazy(() => import("./pages/Etapas/Index.jsx"));
 
-// const OportunidadesList = lazy(() => import("./pages/Oportunidades/Index.jsx"));
-const OportunidadesKanban = lazy(() =>
-  import("./pages/Oportunidades/Kanban.jsx")
-);
-// const CreateOportunidad = lazy(() =>
-//   import("./pages/Oportunidades/Create.jsx")
-// );
-// const ShowOportunidad = lazy(() => import("./pages/Oportunidades/Show.jsx"));
+// Oportunidades
+const OportunidadesKanban = lazy(() => import("./pages/Oportunidades/Kanban.jsx"));
+const CreateOportunidad = lazy(() => import("./pages/Oportunidades/Create.jsx"));
+const ShowOportunidad = lazy(() => import("./pages/Oportunidades/Show.jsx"));
 
 // const Cotizaciones = lazy(() => import("./pages/Cotizaciones/Index.jsx"));
 const CreateCotizacion = lazy(() => import("./pages/Cotizaciones/Create.jsx"));
@@ -137,26 +131,26 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      // {
-      //   path: "clientes/create",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <CreateCliente />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
-      // {
-      //   path: "clientes/edit/:id",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <EditCliente />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
+      {
+        path: "clientes/create",
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={null}>
+              <CreateCliente />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "clientes/edit/:id",
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={null}>
+              <EditCliente />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
 
       // {
       //   path: "vehiculos",
@@ -199,17 +193,6 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-
-      // {
-      //   path: "oportunidades",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <OportunidadesList />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
       {
         path: "oportunidades/kanban",
         element: (
@@ -220,26 +203,26 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      // {
-      //   path: "oportunidades/create",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <CreateOportunidad />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
-      // {
-      //   path: "oportunidades/:id",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <ShowOportunidad />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
+      {
+        path: "oportunidades/create",
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={null}>
+              <CreateOportunidad />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "oportunidades/:id",
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={null}>
+              <ShowOportunidad />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
 
       // {
       //   path: "cotizaciones",
