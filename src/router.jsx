@@ -34,9 +34,10 @@ const CreateCotizacion = lazy(() => import("./pages/Cotizaciones/Create.jsx"));
 const EditCotizacion = lazy(() => import("./pages/Cotizaciones/Edit.jsx"));
 const ShowCotizacion = lazy(() => import("./pages/Cotizaciones/Show.jsx"));
 
+// Facturas
 const Facturas = lazy(() => import("./pages/Facturas/Index.jsx"));
-// const CreateFactura = lazy(() => import("./pages/Facturas/Create.jsx"));
-// const ShowFactura = lazy(() => import("./pages/Facturas/Show.jsx"));
+const CreateFactura = lazy(() => import("./pages/Facturas/Create.jsx"));
+const ShowFactura = lazy(() => import("./pages/Facturas/Show.jsx"));
 
 const router = createBrowserRouter([
   // Login público
@@ -245,26 +246,26 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      // {
-      //   path: "facturas/create/:cotizacionId?",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <CreateFactura />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
-      // {
-      //   path: "facturas/:id",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <ShowFactura />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
+      {
+        path: "facturas/create/:cotizacionId?",
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={null}>
+              <CreateFactura />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "facturas/:id",
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={null}>
+              <ShowFactura />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
 ]);
