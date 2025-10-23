@@ -20,7 +20,6 @@ import {
   DocumentCurrencyDollarIcon,
   DocumentCheckIcon,
   UserGroupIcon,
-  TruckIcon,
   Square2StackIcon,
 } from "@heroicons/react/24/outline";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
@@ -29,19 +28,17 @@ import { getAuth, clearAuth, isAdmin } from "../../utils/auth";
 
 // Menú base: todos los usuarios logueados lo ven
 const baseNavigation = [
-  { name: "Productos", to: "/", icon: BuildingStorefrontIcon },
-  { name: "Ventas", to: "/ventas", icon: RocketLaunchIcon },
+  { name: "Vehículos", to: "/", icon: RocketLaunchIcon },
   { name: "Embudo", to: "/oportunidades/kanban", icon: PuzzlePieceIcon },
   // { name: "Oportunidades", to: "/oportunidades", icon: PuzzlePieceIcon },
   { name: "Cotizaciones", to: "/cotizaciones/create/1", icon: DocumentCurrencyDollarIcon },
   { name: "Facturas", to: "/facturas", icon: DocumentCheckIcon },
   { name: "Clientes", to: "/clientes", icon: UserGroupIcon },
-  { name: "Vehículos", to: "/vehiculos", icon: TruckIcon },
 ];
 
 const adminNavigation = [
-  { name: "Usuarios", to: "/usuarios", icon: UsersIcon },
   { name: "Etapas", to: "/etapas", icon: Square2StackIcon },
+  { name: "Usuarios", to: "/usuarios", icon: UsersIcon },
 ];
 
 function classNames(...classes) {

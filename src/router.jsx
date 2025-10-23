@@ -5,19 +5,15 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 
 const Login = lazy(() => import("./pages/Login.jsx"));
 
-// Productos
-const Productos = lazy(() => import("./pages/Productos/Index.jsx"));
-const CreateProducto = lazy(() => import("./pages/Productos/Create.jsx"));
-const EditProducto = lazy(() => import("./pages/Productos/Edit.jsx"));
+// Vehiculos
+const Vehiculos = lazy(() => import("./pages/Vehiculos/Index.jsx"));
+const CreateVehiculo = lazy(() => import("./pages/Vehiculos/Create.jsx"));
+const EditVehiculo = lazy(() => import("./pages/Vehiculos/Edit.jsx"));
 
 // Usuarios
 const Usuarios = lazy(() => import("./pages/Usuarios/Index.jsx"));
 const CreateUsuarios = lazy(() => import("./pages/Usuarios/Create.jsx"));
 const EditUsuarios = lazy(() => import("./pages/Usuarios/Edit.jsx"));
-
-// Ventas
-const Ventas = lazy(() => import("./pages/Ventas/Index.jsx"));
-const CreateVentas = lazy(() => import("./pages/Ventas/Create.jsx"));
 
 const Clientes = lazy(() => import("./pages/Clientes/Index.jsx"));
 // const CreateCliente = lazy(() => import("./pages/Clientes/Create.jsx"));
@@ -73,49 +69,27 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Suspense fallback={null}>
-              <Productos />
+              <Vehiculos />
             </Suspense>
           </ProtectedRoute>
         ),
       },
       {
-        path: "productos/create",
+        path: "vehiculos/create",
         element: (
           <ProtectedRoute>
             <Suspense fallback={null}>
-              <CreateProducto />
+              <CreateVehiculo />
             </Suspense>
           </ProtectedRoute>
         ),
       },
       {
-        path: "productos/edit/:id",
+        path: "vehiculos/edit/:id",
         element: (
           <ProtectedRoute>
             <Suspense fallback={null}>
-              <EditProducto />
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-
-      // Ventas → solo requiere estar logueado
-      {
-        path: "ventas",
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={null}>
-              <Ventas />
-            </Suspense>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "ventas/create",
-        element: (
-          <ProtectedRoute>
-            <Suspense fallback={null}>
-              <CreateVentas />
+              <EditVehiculo />
             </Suspense>
           </ProtectedRoute>
         ),

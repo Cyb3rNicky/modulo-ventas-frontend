@@ -12,10 +12,6 @@ export async function apiFetch(url, options = {}) {
     ...options.headers,
   };
 
-  // 🔍 Debug: ver los headers antes del fetch
-  console.log("🚀 API Fetch:", url);
-  console.log("📦 Options:", { ...options, headers });
-
   const resp = await fetch(url, { ...options, headers });
 
   if (!resp.ok) {
