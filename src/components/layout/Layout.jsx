@@ -30,8 +30,7 @@ import { getAuth, clearAuth, isAdmin } from "../../utils/auth";
 const baseNavigation = [
   { name: "Vehículos", to: "/", icon: RocketLaunchIcon },
   { name: "Embudo", to: "/oportunidades/kanban", icon: PuzzlePieceIcon },
-  // { name: "Oportunidades", to: "/oportunidades", icon: PuzzlePieceIcon },
-  { name: "Cotizaciones", to: "/cotizaciones/create/1", icon: DocumentCurrencyDollarIcon },
+  { name: "Cotizaciones", to: "/cotizaciones/", icon: DocumentCurrencyDollarIcon },
   { name: "Facturas", to: "/facturas", icon: DocumentCheckIcon },
   { name: "Clientes", to: "/clientes", icon: UserGroupIcon },
 ];

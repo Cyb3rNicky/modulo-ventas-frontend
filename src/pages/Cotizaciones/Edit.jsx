@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getOportunidades } from "../../services/Oportunidades/getOportunidades";
+import { getCotizacionById } from "../../services/Cotizaciones/getCotizacionById";
+import { updateCotizacionEstado } from "../../services/Cotizaciones/updateCotizacionEstado";
+import { getItemsByCotizacionId } from "../../services/CotizacionItems/getItemsByCotizacionId";
 import { getVehiculos } from "../../services/Vehiculos/getVehiculos";
-import { createCotizacion } from "../../services/Cotizaciones/createCotizacion";
 import { createItem } from "../../services/CotizacionItems/createItem";
+import { updateItem } from "../../services/CotizacionItems/updateItem";
+import { deleteItem } from "../../services/CotizacionItems/deleteItem";
 
 const currency = new Intl.NumberFormat("es-GT", { style: "currency", currency: "GTQ", maximumFractionDigits: 2 });
 const toNumber = (v) => {
@@ -11,34 +14,35 @@ const toNumber = (v) => {
   return Number.isFinite(n) ? n : 0;
 };
 
-export default function CreateCotizacion() {
+export default function EditCotizacion() {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const { oportunidadId } = useParams();
 
-  const [oportunidades, setOportunidades] = useState([]);
+  const [cotizacion, setCotizacion] = useState(null);
+  const [activa, setActiva] = useState(true);
   const [vehiculos, setVehiculos] = useState([]);
+  const [items, setItems] = useState([]); // descuento como string
 
-  const [form, setForm] = useState({ oportunidadId: "", activa: true });
-  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
-        const [ops, vhs] = await Promise.all([getOportunidades(), getVehiculos()]);
-        setOportunidades(ops);
+        const [c, its, vhs] = await Promise.all([getCotizacionById(id), getItemsByCotizacionId(id), getVehiculos()]);
+        setCotizacion(c);
+        setActiva(!!c.activa);
+        setItems(its.map((x) => ({ ...x, _tmp: false, descuento: String(x.descuento ?? "") })));
         setVehiculos(vhs);
-        setForm((f) => ({ ...f, oportunidadId: oportunidadId || "" }));
       } catch (e) {
-        setError(e.message || "No se pudo cargar datos");
+        setError(e.message || "No se pudo cargar la cotización");
       } finally {
         setLoading(false);
       }
     })();
-  }, [oportunidadId]);
+  }, [id]);
 
   const addItem = () => {
     if (!vehiculos.length) return;
@@ -46,19 +50,19 @@ export default function CreateCotizacion() {
     setItems((prev) => [
       ...prev,
       {
-        _tmpId: Date.now(),
+        id: `tmp-${Date.now()}`,
+        _tmp: true,
         vehiculoId: v.id,
         descripcion: `${v.marca} ${v.modelo} (${v.anio})`,
         cantidad: 1,
         precioUnitario: toNumber(v.precio),
-        descuento: "", // string para permitir vacío
+        descuento: "", // string
       },
     ]);
   };
 
-  const updateItem = (tmpId, patch) =>
-    setItems((prev) => prev.map((it) => (it._tmpId === tmpId ? { ...it, ...patch } : it)));
-  const removeItem = (tmpId) => setItems((prev) => prev.filter((it) => it._tmpId !== tmpId));
+  const updateRow = (rowId, patch) => setItems((prev) => prev.map((it) => (it.id === rowId ? { ...it, ...patch } : it)));
+  const removeRow = (rowId) => setItems((prev) => prev.filter((it) => it.id !== rowId));
 
   // Totales: solo descuentos por ítem
   const totales = useMemo(() => {
@@ -71,40 +75,57 @@ export default function CreateCotizacion() {
   const onSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-
-    if (!form.oportunidadId) return setError("Selecciona una oportunidad");
-    if (!items.length) return setError("Agrega al menos un ítem");
-
     try {
-      setSubmitting(true);
-      // 1) Crear cotización con total calculado
-      const created = await createCotizacion({
-        oportunidadId: Number(form.oportunidadId),
-        activa: !!form.activa,
-        total: totales.total,
-      });
-      const cotizacionId = created?.id ?? created?.data?.id;
-      if (!cotizacionId) throw new Error("No se pudo obtener el ID de la cotización");
+      setSaving(true);
 
-      // 2) Crear ítems
-      await Promise.all(
-        items.map((it) =>
+      const creates = items.filter((it) => it._tmp === true);
+      const updates = items.filter((it) => it._tmp !== true);
+
+      await Promise.all([
+        ...creates.map((it) =>
           createItem({
-            cotizacionId,
+            cotizacionId: Number(id),
             vehiculoId: Number(it.vehiculoId),
             descripcion: it.descripcion,
             cantidad: Number(it.cantidad),
             precioUnitario: Number(it.precioUnitario),
             descuento: toNumber(it.descuento),
           })
-        )
-      );
+        ),
+        ...updates.map((it) =>
+          updateItem({
+            id: it.id,
+            vehiculoId: Number(it.vehiculoId),
+            descripcion: it.descripcion,
+            cantidad: Number(it.cantidad),
+            precioUnitario: Number(it.precioUnitario),
+            descuento: toNumber(it.descuento),
+          })
+        ),
+      ]);
 
-      navigate(`/cotizaciones/${cotizacionId}`);
+      // Actualizamos estado y total (sin descuento global)
+      await updateCotizacionEstado({ id: Number(id), activa, total: totales.total });
+
+      navigate(`/cotizaciones/${id}`);
     } catch (err) {
-      setError(err.message || "No se pudo crear la cotización");
+      setError(err.message || "No se pudo guardar la cotización");
     } finally {
-      setSubmitting(false);
+      setSaving(false);
+    }
+  };
+
+  const onDeleteItem = async (itemId) => {
+    if (String(itemId).startsWith("tmp-")) {
+      removeRow(itemId);
+      return;
+    }
+    if (!window.confirm("¿Eliminar ítem?")) return;
+    try {
+      await deleteItem(itemId);
+      removeRow(itemId);
+    } catch (e) {
+      setError(e.message || "No se pudo eliminar el ítem");
     }
   };
 
@@ -114,11 +135,11 @@ export default function CreateCotizacion() {
     <form onSubmit={onSubmit} className="px-4 sm:px-6 lg:px-8 space-y-6">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-base font-semibold text-gray-900">Crear cotización</h1>
-          <p className="mt-2 text-sm text-gray-700">Asocia una oportunidad y agrega ítems con precios y descuentos.</p>
+          <h1 className="text-base font-semibold text-gray-900">Editar cotización #{cotizacion?.id}</h1>
+          <p className="mt-2 text-sm text-gray-700">Oportunidad #{cotizacion?.oportunidadId}</p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <Link to="/cotizaciones" className="rounded-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-200">
+          <Link to={`/cotizaciones/${id}`} className="rounded-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-200">
             Volver
           </Link>
         </div>
@@ -129,28 +150,8 @@ export default function CreateCotizacion() {
       <div className="rounded-lg bg-white shadow-sm ring-1 ring-gray-200 p-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Oportunidad</label>
-            <select
-              value={form.oportunidadId}
-              onChange={(e) => setForm((f) => ({ ...f, oportunidadId: e.target.value }))}
-              className="mt-1 block w-full rounded-md border-gray-300"
-            >
-              <option value="">— Selecciona —</option>
-              {oportunidades.map((o) => (
-                <option key={o.id} value={o.id}>
-                  #{o.id} — {o.clienteLabel ?? `Cliente #${o.clienteId}`}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
             <label className="block text-sm font-medium text-gray-700">Estado</label>
-            <select
-              value={form.activa ? "1" : "0"}
-              onChange={(e) => setForm((f) => ({ ...f, activa: e.target.value === "1" }))}
-              className="mt-1 block w-full rounded-md border-gray-300"
-            >
+            <select value={activa ? "1" : "0"} onChange={(e) => setActiva(e.target.value === "1")} className="mt-1 block w-full rounded-md border-gray-300">
               <option value="1">Activa</option>
               <option value="0">Inactiva</option>
             </select>
@@ -181,13 +182,13 @@ export default function CreateCotizacion() {
           <tbody className="divide-y divide-gray-200 bg-white">
             {items.length ? (
               items.map((it) => (
-                <tr key={it._tmpId}>
+                <tr key={it.id}>
                   <td className="py-3 pr-3 pl-4 sm:pl-0">
                     <select
                       value={it.vehiculoId}
                       onChange={(e) => {
                         const v = vehiculos.find((v) => String(v.id) === e.target.value);
-                        updateItem(it._tmpId, {
+                        updateRow(it.id, {
                           vehiculoId: v.id,
                           descripcion: `${v.marca} ${v.modelo} (${v.anio})`,
                           precioUnitario: toNumber(v.precio),
@@ -203,20 +204,10 @@ export default function CreateCotizacion() {
                     </select>
                   </td>
                   <td className="px-3 py-3">
-                    <input
-                      value={it.descripcion}
-                      onChange={(e) => updateItem(it._tmpId, { descripcion: e.target.value })}
-                      className="block w-72 rounded-md border-gray-300"
-                    />
+                    <input value={it.descripcion} onChange={(e) => updateRow(it.id, { descripcion: e.target.value })} className="block w-72 rounded-md border-gray-300" />
                   </td>
                   <td className="px-3 py-3">
-                    <input
-                      type="number"
-                      min={1}
-                      value={it.cantidad}
-                      onChange={(e) => updateItem(it._tmpId, { cantidad: toNumber(e.target.value) || 1 })}
-                      className="block w-24 rounded-md border-gray-300"
-                    />
+                    <input type="number" min={1} value={it.cantidad} onChange={(e) => updateRow(it.id, { cantidad: toNumber(e.target.value) || 1 })} className="block w-24 rounded-md border-gray-300" />
                   </td>
                   <td className="px-3 py-3">
                     <input
@@ -225,7 +216,7 @@ export default function CreateCotizacion() {
                       step="0.01"
                       min={0}
                       value={it.precioUnitario}
-                      onChange={(e) => updateItem(it._tmpId, { precioUnitario: toNumber(e.target.value) })}
+                      onChange={(e) => updateRow(it.id, { precioUnitario: toNumber(e.target.value) })}
                       className="block w-28 rounded-md border-gray-300"
                     />
                   </td>
@@ -235,8 +226,8 @@ export default function CreateCotizacion() {
                       inputMode="decimal"
                       step="0.01"
                       min={0}
-                      value={it.descuento} // string (permite vacío)
-                      onChange={(e) => updateItem(it._tmpId, { descuento: e.target.value })}
+                      value={it.descuento} // string
+                      onChange={(e) => updateRow(it.id, { descuento: e.target.value })}
                       className="block w-24 rounded-md border-gray-300"
                       placeholder="0.00"
                     />
@@ -245,7 +236,7 @@ export default function CreateCotizacion() {
                     {currency.format(it.cantidad * it.precioUnitario - toNumber(it.descuento))}
                   </td>
                   <td className="px-3 py-3">
-                    <button type="button" onClick={() => removeItem(it._tmpId)} className="text-sm text-red-600 hover:underline">
+                    <button type="button" onClick={() => onDeleteItem(it.id)} className="text-sm text-red-600 hover:underline">
                       Eliminar
                     </button>
                   </td>
@@ -254,7 +245,7 @@ export default function CreateCotizacion() {
             ) : (
               <tr>
                 <td colSpan={7} className="px-3 py-10 text-center text-sm text-gray-500">
-                  Agrega ítems para calcular la cotización.
+                  Sin ítems.
                 </td>
               </tr>
             )}
@@ -273,12 +264,8 @@ export default function CreateCotizacion() {
       </div>
 
       <div className="flex justify-end">
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded-md bg-indigo-900 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-        >
-          {submitting ? "Guardando…" : "Guardar cotización"}
+        <button type="submit" disabled={saving} className="rounded-md bg-indigo-900 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">
+          {saving ? "Guardando…" : "Guardar cambios"}
         </button>
       </div>
     </form>

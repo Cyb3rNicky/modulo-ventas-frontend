@@ -28,10 +28,11 @@ const OportunidadesKanban = lazy(() => import("./pages/Oportunidades/Kanban.jsx"
 const CreateOportunidad = lazy(() => import("./pages/Oportunidades/Create.jsx"));
 const ShowOportunidad = lazy(() => import("./pages/Oportunidades/Show.jsx"));
 
-// const Cotizaciones = lazy(() => import("./pages/Cotizaciones/Index.jsx"));
+// Cotizaciones
+const Cotizaciones = lazy(() => import("./pages/Cotizaciones/Index.jsx"));
 const CreateCotizacion = lazy(() => import("./pages/Cotizaciones/Create.jsx"));
-// const EditCotizacion = lazy(() => import("./pages/Cotizaciones/Edit.jsx"));
-// const ShowCotizacion = lazy(() => import("./pages/Cotizaciones/Show.jsx"));
+const EditCotizacion = lazy(() => import("./pages/Cotizaciones/Edit.jsx"));
+const ShowCotizacion = lazy(() => import("./pages/Cotizaciones/Show.jsx"));
 
 const Facturas = lazy(() => import("./pages/Facturas/Index.jsx"));
 // const CreateFactura = lazy(() => import("./pages/Facturas/Create.jsx"));
@@ -152,37 +153,6 @@ const router = createBrowserRouter([
         ),
       },
 
-      // {
-      //   path: "vehiculos",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <Vehiculos />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
-      // {
-      //   path: "vehiculos/create",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <CreateVehiculo />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
-      // {
-      //   path: "vehiculos/edit/:id",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <EditVehiculo />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
-
       {
         path: "etapas",
         element: (
@@ -224,16 +194,16 @@ const router = createBrowserRouter([
         ),
       },
 
-      // {
-      //   path: "cotizaciones",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <Cotizaciones />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
+      {
+        path: "cotizaciones",
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={null}>
+              <Cotizaciones />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
       {
         path: "cotizaciones/create/:oportunidadId?",
         element: (
@@ -244,26 +214,26 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      // {
-      //   path: "cotizaciones/edit/:id",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <EditCotizacion />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
-      // {
-      //   path: "cotizaciones/:id",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <Suspense fallback={null}>
-      //         <ShowCotizacion />
-      //       </Suspense>
-      //     </ProtectedRoute>
-      //   ),
-      // },
+      {
+        path: "cotizaciones/edit/:id",
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={null}>
+              <EditCotizacion />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "cotizaciones/:id",
+        element: (
+          <ProtectedRoute>
+            <Suspense fallback={null}>
+              <ShowCotizacion />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
 
       {
         path: "facturas",
