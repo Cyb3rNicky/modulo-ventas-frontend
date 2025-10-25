@@ -1,41 +1,52 @@
 import { apiFetch } from "../../utils/apiFetch";
 import { isAdmin, getAuth } from "../../utils/auth";
 
+const toNum = v => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
+
 export const getOportunidades = async () => {
-  const admin = isAdmin();
-  const usuarioId = getAuth()?.user?.id;
+  const admin = !!isAdmin();
+  const authUserId = toNum(getAuth()?.user?.id);
 
   const base = "https://web-service-ventas-api.onrender.com/api/oportunidades";
-  const url = (admin || !usuarioId) ? base : `${base}/usuario/${usuarioId}`;
-
-  const json = await apiFetch(url, { method: "GET" });
+  // Siempre traemos todas; filtramos si no es admin
+  const json = await apiFetch(base, { method: "GET" });
   const data = Array.isArray(json) ? json : Array.isArray(json?.data) ? json.data : [];
 
-  return data.map(o => {
-    const clienteId = o.cliente?.id ?? null;
-    const usuarioIdResp = o.vendedor?.id ?? null;
-    const etapaId = o.etapa?.id ?? null;
+  // Si no es admin, nos quedamos solo con las suyas
+  const filtered = (!admin && authUserId)
+    ? data.filter(o => {
+        const vendedorId = toNum(o?.vendedor?.id ?? o?.usuario?.id ?? o?.usuarioId);
+        return vendedorId === authUserId;
+      })
+    : data;
 
-    const clienteLabel = o.cliente?.nombre ?? (clienteId ? `Cliente #${clienteId}` : "Cliente");
-    const asesorLabel  = [o.vendedor?.nombre, o.vendedor?.apellido].filter(Boolean).join(" ") || (usuarioIdResp ? `Usuario #${usuarioIdResp}` : "Usuario");
-    const vehiculoLabel = [o.vehiculo?.marca, o.vehiculo?.modelo].filter(Boolean).join(" ") || "Vehículo";
+  // Mapeo para UI (igual que antes, con pequeños fallbacks)
+  return filtered.map(o => {
+    const clienteId = toNum(o?.cliente?.id ?? o?.clienteId);
+    const usuarioIdResp = toNum(o?.vendedor?.id ?? o?.usuario?.id ?? o?.usuarioId);
+    const etapaId = toNum(o?.etapa?.id ?? o?.etapaId);
+
+    const clienteLabel = o?.cliente?.nombre ?? (clienteId ? `Cliente #${clienteId}` : "Cliente");
+    const asesorLabel  = [o?.vendedor?.nombre ?? o?.usuario?.nombre, o?.vendedor?.apellido ?? o?.usuario?.apellido]
+      .filter(Boolean).join(" ")
+      || (usuarioIdResp ? `Usuario #${usuarioIdResp}` : "Usuario");
+    const vehiculoLabel = [o?.vehiculo?.marca ?? o?.vehiculoMarca, o?.vehiculo?.modelo ?? o?.vehiculoModelo]
+      .filter(Boolean).join(" ")
+      || "Vehículo";
 
     return {
-      id: o.id,
-      activa: !!o.activa,
-
-      // ids (cuando existan en la respuesta)
+      id: toNum(o.id),
+      activa: o?.activa === undefined ? true : !!o.activa,
       clienteId,
       usuarioId: usuarioIdResp,
       etapaId,
-
-      // etiquetas listas para UI
       clienteLabel,
       asesorLabel,
       vehiculoLabel,
-
-      // si llegara a venir el precio en el futuro
-      total: Number(o.total ?? 0),
+      total: Number(o?.total ?? 0),
     };
   });
 };
